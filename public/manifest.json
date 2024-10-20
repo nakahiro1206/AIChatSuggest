@@ -1,5 +1,5 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "My Extension",
     "version": "1.0",
     "description": "クリックでモーダルを開き、データをfetchします。",
@@ -9,8 +9,13 @@
     "permissions": [
       "storage",
       "scripting", 
-      "tabs"
+      "tabs", 
+      "offscreen"
     ],
+    "background": {
+      "service_worker": "service_worker.js",
+      "type": "module"
+    }, 
     "action": {
       "default_popup": "popup.html",
       "default_icon": {

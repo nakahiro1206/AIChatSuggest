@@ -3,13 +3,15 @@ const CopyPlugin = require("copy-webpack-plugin");
 const srcDir = path.join(__dirname, "src");
 
 module.exports = {
-  mode: "development",
   target: "node", 
   entry: {
     popup: path.join(srcDir, 'popup.tsx'),
     // background: path.join(srcDir, 'background.ts'),
     // content_script: path.join(srcDir, 'content_script.tsx'),
-    service_worker: path.join(srcDir, 'scrapeProfile.ts'),
+    // service_worker: path.join(srcDir, 'scrapeProfile.ts'),
+    service_worker: path.join(srcDir, 'service_worker.ts'),
+    offscreen: path.join(srcDir, 'offscreen.ts'),
+    test: path.join(srcDir, 'scrapeTest.ts'),
   },
   output: {
     path: path.resolve(__dirname, "dist"),
