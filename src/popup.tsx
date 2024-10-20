@@ -8,7 +8,6 @@ import { Box, BoxProps } from '@mui/material';
 import Textarea from '@mui/joy/Textarea';
 import Button from '@mui/joy/Button';
 
-
 import { usePopup } from './hooks';
 
 function Item(props: BoxProps) {
@@ -44,7 +43,7 @@ const Popup = () => {
   const {
     isLoading,
     getConversationsFromCurrentURL, getProfileFromMessagePage,
-    profileRef, conversationRef,  
+    profileRef, conversationsRef,  
   } = usePopup();
 
  return(
@@ -94,7 +93,7 @@ const Popup = () => {
         <Textarea
         minRows={2} 
         maxRows={10}
-        slotProps={{ textarea: { ref: conversationRef } }}
+        slotProps={{ textarea: { ref: conversationsRef } }}
         />
       </Box>
     </Item>

@@ -1,3 +1,5 @@
+import { QUERY } from './env';
+
 const getTextContent = (elements: NodeListOf<Element>): string => {
     return Array
     .from(elements)
@@ -11,19 +13,15 @@ export const extractProfile = (htmlText: string) => {
     const document = parser.parseFromString(htmlText, 'text/html');
 
     // Extract content using DOMParser
-    const nickname = getTextContent(document.querySelectorAll('.profile_main-nickname'));
-    const ageAndRegion = getTextContent(document.querySelectorAll('.profile_main-age-address'));
-    /**好みカード */
-    const preference = getTextContent(document.querySelectorAll('.group-card_title'));
-    /**共通点 */
-    const commonality = getTextContent(document.querySelectorAll('.profile-affinity'));
-    /**好みベスト */
+    const nickname = getTextContent(document.querySelectorAll(QUERY.NICKNAME));
+    const ageAndRegion = getTextContent(document.querySelectorAll(QUERY.AGE_AND_REGION));
+    const preference = getTextContent(document.querySelectorAll(QUERY.PREFERENCE));
+    const commonality = getTextContent(document.querySelectorAll(QUERY.COMMANITY));
     const favorite = {
-      title: getTextContent(document.querySelectorAll('.konomi-comment_name')),
-      description: getTextContent(document.querySelectorAll('.konomi-comment_text'))
+      title: getTextContent(document.querySelectorAll(QUERY.FAVORITE.TITLE)),
+      description: getTextContent(document.querySelectorAll(QUERY.FAVORITE.DESCRIPTION))
     };
-    /**自己紹介 */ 
-    const introduction = getTextContent(document.querySelectorAll('.profile-introduction_content'));
+    const introduction = getTextContent(document.querySelectorAll(QUERY.INTRODUCTION));
     
     // Output the extracted contents
     const res: string = `\
@@ -42,10 +40,10 @@ export const extractConversations = (htmlText: string) => {
     const parser = new DOMParser();
     const document = parser.parseFromString(htmlText, 'text/html');
 
-    const messages = Array.from(document.querySelectorAll('.message_balloon.has-message'))
-    .map(el => {
-        const sender = el.getAttribute('data-sender') || 'unknown';
-        const text = el.querySelector('p')?.textContent?.trim() || '';
+    const messages = Array.from(document.querySelectorAll(QUERY.MESSAGES))
+    .map(elem => {
+        const sender = elem.getAttribute(QUERY.SENDER_ATTRIBUTE) || 'unknown';
+        const text = elem.querySelector('p')?.textContent?.trim() || '';
         // const time = el.querySelector('.message_sent-at')?.textContent?.trim() || '';
         return { sender, text };
     });
@@ -54,4 +52,33 @@ export const extractConversations = (htmlText: string) => {
     const res = messages.map(msg => `[${msg.sender}] ${msg.text}`).join('\n');
 
     return res;
+}
+
+// ローカルストレージからデータを読み込む関数
+export const loadData = (key: string, textareaRef: React.RefObject<HTMLTextAreaElement>) => {
+    // const data = await 
+    chrome.storage.local.get(key)
+    .then((data: any) => {
+      const value = data[key] as string;
+      const textarea = textareaRef.current;
+      if (value && textarea !== null) {
+        textarea.value = value;
+      }
+    })
+};
+
+export const storeData = (key: string, value: string) => {
+    // ローカルストレージに保存
+    const obj: { [key: string]: string } = {};
+    obj[key] = value;
+    chrome.storage.local.set(obj);
+}
+
+export const getCurrentTabURL = async (): Promise<string | undefined> => {
+    return chrome.tabs.query({ active: true, currentWindow: true })
+    .then((tabs: chrome.tabs.Tab[]) => {
+      const currentURL: string | undefined = tabs[0].url;
+      console.log(currentURL);
+      return currentURL;
+    })
 }

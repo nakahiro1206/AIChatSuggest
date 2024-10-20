@@ -6,12 +6,8 @@ module.exports = {
   target: "node", 
   entry: {
     popup: path.join(srcDir, 'popup.tsx'),
-    // background: path.join(srcDir, 'background.ts'),
-    // content_script: path.join(srcDir, 'content_script.tsx'),
-    // service_worker: path.join(srcDir, 'scrapeProfile.ts'),
     service_worker: path.join(srcDir, 'service_worker.ts'),
     offscreen: path.join(srcDir, 'offscreen.ts'),
-    test: path.join(srcDir, 'scrapeTest.ts'),
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -29,9 +25,6 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
-          // options: {
-          //   presets: ["@babel/preset-env", "@babel/preset-react"],
-          // },
         },
       },
       {
@@ -44,10 +37,6 @@ module.exports = {
     extensions: [".tsx",".ts",".js",".jsx","json"],
   },
   plugins: [
-    // new HtmlWebpackPlugin({
-    //   template: "./public/popup.html",
-    //   filename: "popup.html",
-    // }),
     new CopyPlugin({
       patterns: [{ from: "./public" }],
     }), 
