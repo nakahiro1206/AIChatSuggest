@@ -3,7 +3,9 @@
     "name": "My Extension",
     "version": "1.0",
     "description": "chrome extension for AI chat support",
-    "host_permissions": [], 
+    "host_permissions": [
+      "https://api.openai.com/v1/chat/completions"
+    ], 
     "permissions": [
       "storage",
       "scripting", 

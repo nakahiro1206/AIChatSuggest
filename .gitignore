@@ -1,5 +1,5 @@
 # env
-env.ts
+src/env/env.ts
 
 # manifest
 public/manifest.json
