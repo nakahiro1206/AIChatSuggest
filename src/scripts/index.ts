@@ -5,4 +5,3 @@ export {
   ReceiveConversationsMessage,
   Profile,
 } from "./type";
-export { usePopup } from "./hooks";

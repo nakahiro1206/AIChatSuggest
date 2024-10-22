@@ -7,6 +7,11 @@ const getTextContent = (elements: NodeListOf<Element>): string => {
     .join(", ");
 };
 
+const getTextContentToArray = (elements: NodeListOf<Element>): string[] => {
+  return Array.from(elements)
+    .map((el) => el.textContent?.trim() || "")
+};
+
 const integrateTitleAndDescription = (
   titles: NodeListOf<Element>,
   descriptopns: NodeListOf<Element>,
@@ -33,10 +38,10 @@ export const extractProfile = (htmlText: string): Profile => {
   const ageAndRegion = getTextContent(
     document.querySelectorAll(QUERY.AGE_AND_REGION),
   );
-  const preference = getTextContent(
+  const preference = getTextContentToArray(
     document.querySelectorAll(QUERY.PREFERENCE),
   );
-  const commonality = getTextContent(
+  const commonality = getTextContentToArray(
     document.querySelectorAll(QUERY.COMMONALITY),
   );
   const favorite = integrateTitleAndDescription(

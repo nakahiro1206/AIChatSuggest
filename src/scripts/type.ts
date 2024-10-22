@@ -49,8 +49,8 @@ export const isConversations = (data: any): data is ConversationItem[] => {
 export type Profile = {
   nickname: string;
   ageAndRegion: string;
-  preference: string;
-  commonality: string;
+  preference: string[];
+  commonality: string[];
   favorite: FavoriteItem[];
   introduction: string;
 };
@@ -60,15 +60,56 @@ export type FavoriteItem = {
   description: string;
 };
 
+export const isFavoriteItems = (data: any): data is FavoriteItem[] => {
+  if (!Array.isArray(data)) {
+    return false;
+  }
+
+  return data.every(
+    (item) =>
+      typeof item === "object" &&
+      item !== null &&
+      typeof item.title === "string" &&
+      typeof item.description === "string"
+  );
+};
+
+export const isStringArray = (data: any): data is string[] => {
+  if (!Array.isArray(data)) {
+    return false;
+  }
+
+  return data.every(
+    (item) =>
+      typeof item === "string"
+  );
+};
+
 export const isProfile = (data: any): data is Profile => {
   return (
     typeof data === "object" &&
     data !== null &&
     typeof data.nickname === "string" &&
     typeof data.ageAndRegion === "string" &&
-    typeof data.preference === "string" &&
-    typeof data.commonality === "string" &&
-    typeof data.favorite === "string" &&
+    isStringArray(data.preference) &&
+    isStringArray(data.commonality) &&
+    isFavoriteItems(data.favorite) &&
     typeof data.introduction === "string"
   );
 };
+
+export type UserInfo = {
+  profile: Profile;
+  conversations: ConversationItem[];
+  generatedMessage: string;
+}
+
+export const isUserInfo = (data: any): data is UserInfo => {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    isProfile(data.profile) &&
+    isConversations(data.conversations) &&
+    typeof data.generatedMessage === "string"
+  )
+}

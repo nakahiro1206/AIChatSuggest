@@ -8,46 +8,35 @@ import { Box, BoxProps } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
 import Button from "@mui/joy/Button";
 
-import { usePopup } from "./scripts";
+import {useStates, usePort, handlers} from './scripts/stateManagement'
 
-function Item(props: BoxProps) {
-  const { sx, ...other } = props;
-  return (
-    <Box
-      sx={[
-        (theme) => ({
-          p: 1,
-          m: 1,
-          bgcolor: "grey.100",
-          color: "grey.800",
-          border: "1px solid",
-          borderColor: "grey.300",
-          borderRadius: 2,
-          fontSize: "0.875rem",
-          fontWeight: "700",
-          ...theme.applyStyles("dark", {
-            bgcolor: "#101010",
-            color: "grey.300",
-            borderColor: "grey.800",
-          }),
-        }),
-        ...(Array.isArray(sx) ? sx : [sx]),
-      ]}
-      {...other}
-    />
-  );
-}
+import { Item, ProfileComponent } from "./components";
 
 const Popup = () => {
   const {
     isLoading,
+    setIsLoadingProfile,
+    setIsLoadingConversations,
+    setIsLoadingAIGeneration,
+    conversationsRef,
+    AIGenerationRef,
+    userInfo, setUserInfo
+  } = useStates();
+
+  const {fetchData} = usePort(userInfo, setUserInfo)
+
+  const {
     getConversationsFromCurrentURL,
     getProfileFromMessagePage,
     generateNextMessage,
-    profileRef,
-    conversationsRef,
+  } = handlers(
+    setIsLoadingProfile,
+    setIsLoadingConversations,
+    setIsLoadingAIGeneration,
+    fetchData,
     AIGenerationRef,
-  } = usePopup();
+  );
+
 
   return (
     <Box
@@ -73,11 +62,12 @@ const Popup = () => {
           </Button>
         </Box>
         <Box sx={{ p: 1 }}>
-          <Textarea
+          {/* <Textarea
             minRows={2}
             maxRows={10}
             slotProps={{ textarea: { ref: profileRef } }}
-          />
+          /> */}
+          <ProfileComponent profile={userInfo.profile}/>
         </Box>
       </Item>
       <Item>

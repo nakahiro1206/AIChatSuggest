@@ -15,3 +15,5 @@ export const QUERY = {
   MESSAGES: "",
   SENDER_ATTRIBUTE: "",
 };
+
+export const OPENAI_API_KEY="";

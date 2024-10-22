@@ -4,6 +4,8 @@ import {
   ConversationItem,
   isConversations,
   FavoriteItem,
+  UserInfo,
+  isUserInfo
 } from "./type";
 
 // ローカルストレージからデータを読み込む関数
@@ -51,7 +53,22 @@ export const loadConversations = (
   });
 };
 
-export const storeData = (key: string, value: Profile | ConversationItem[]) => {
+export const loadUserInfo = (
+  userId: string,
+  setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>,
+) => {
+  // const data = await
+  chrome.storage.local.get(userId).then((data: any) => {
+    const value: any = data[userId];
+    if (!isUserInfo(value)) {
+      console.error("invalid data for ConversationItem[]");
+    } else {
+      setUserInfo(value);
+    }
+  });
+};
+
+export const storeUserInfo = (key: string, value: UserInfo) => {
   // ローカルストレージに保存
   const obj: { [key: string]: any } = {};
   obj[key] = value;
