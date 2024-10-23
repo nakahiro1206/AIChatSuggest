@@ -4,13 +4,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, unstable_useEnhancedEffect } from "@mui/material";
 import Button from "@mui/joy/Button";
 
 import {useStates, usePort, 
   profileOnClickHandler, 
   conversationsOnClickHandler,
-  AIGenerationOnClickHandler
+  AIGenerationOnClickHandler,
 } from './scripts/stateManagement'
 
 import { 
@@ -24,16 +24,18 @@ const Popup = () => {
     setIsLoadingProfile,
     setIsLoadingConversations,
     setIsLoadingAIGeneration,
-    userInfo, setUserInfo
+    userInfo, setUserInfo,
+    userId,
   } = useStates();
 
-  const {callCommandToExtractDataFromUrl} = usePort(userInfo, setUserInfo)
+  const {callCommandToExtractDataFromUrl} = usePort(userInfo, setUserInfo, userId)
 
   const {
     getProfileFromMessagePage
   } = profileOnClickHandler(
     setIsLoadingProfile, 
-    callCommandToExtractDataFromUrl
+    callCommandToExtractDataFromUrl,
+    userId
   )
 
   const {
@@ -69,6 +71,9 @@ const Popup = () => {
         height: 800
       }}
     >
+      <Box>
+        ID: {userId !== undefined ? userId : "Go to a message page with some partner!"}
+      </Box>
       <Box sx={{ 
         borderBottom: 1, 
         borderColor: 'divider',
@@ -86,6 +91,7 @@ const Popup = () => {
           <Box sx={{ p: 1 }}>
             <Button
               onClick={getProfileFromMessagePage}
+              disabled={userId === undefined}
               loading={isLoading.profile}
               sx={{
                 whiteSpace: "nowrap",
@@ -104,6 +110,7 @@ const Popup = () => {
         <Box sx={{ p: 1 }}>
           <Button
             onClick={getConversationsFromCurrentURL}
+            disabled={userId === undefined}
             loading={isLoading.conversations}
             sx={{
               whiteSpace: "nowrap",
@@ -125,6 +132,7 @@ const Popup = () => {
               whiteSpace: "nowrap",
             }}
             onClick={generateNextMessage}
+            disabled={userId === undefined}
             loading={isLoading.AIgeneration}
           >
             AI generation

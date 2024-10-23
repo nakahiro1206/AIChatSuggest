@@ -1,26 +1,17 @@
 import {MESSAGE_PAGE_URL_PATTERN, formatUserPageURL, OPENAI_API_KEY} from "../../env"
-import {getCurrentTabURL} from "../utils"
+import {getCurrentTabURL} from "../handleURL"
 import { CallCommands, UserInfo, stringifyUserInfo } from "../type";
 
 export const profileOnClickHandler = (
   setIsLoadingProfile:(b: boolean)=>void,
   callCommandToExtractDataFromUrl: (resourceURL: URL, callCommand: CallCommands, setIsloadingOfItem: (setTo: boolean) => void) => void,
+  userId: string | undefined
 ) => {
 
   const getProfileFromMessagePage = async () => {
-    const messagePageURL: string | undefined = await getCurrentTabURL();
-    if (!messagePageURL) {
-      throw new Error("Failed to get current URL!");
+    if (!userId) {
+      throw new Error("getProfileFromMessagePage: userId is undefined!");
     }
-
-    const userIdMatch: RegExpMatchArray | null = messagePageURL.match(
-      MESSAGE_PAGE_URL_PATTERN,
-    );
-    if (!userIdMatch) {
-      throw new Error(`no match for ${messagePageURL}`);
-    }
-
-    const userId: string = userIdMatch[1];
 
     const userPageURL = new URL(formatUserPageURL(userId));
 

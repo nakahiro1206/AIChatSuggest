@@ -3,10 +3,9 @@ import { storeUserInfo } from "../loadAndStore";
 
 export const usePort = (
     userInfo: UserInfo, 
-    setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>
+    setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>,
+    userId: string | undefined
 ) => {
-    const USER_INFO_KEY = "userId";
-
     const port = chrome.runtime.connect({ name: "popup-serviceWorker" });
     port.onMessage.addListener((message: Message) => {
       if (message.action == "receiveProfile") {
@@ -17,7 +16,7 @@ export const usePort = (
         
         setUserInfo(newUserInfo)
   
-        storeUserInfo(USER_INFO_KEY, newUserInfo);
+        storeUserInfo(userId, newUserInfo);
 
       } else if (message.action == "receiveConversations") {
         console.log(message.content);
@@ -27,7 +26,7 @@ export const usePort = (
 
         setUserInfo(newUserInfo)
   
-        storeUserInfo(USER_INFO_KEY, newUserInfo);
+        storeUserInfo(userId, newUserInfo);
       }
     });
   

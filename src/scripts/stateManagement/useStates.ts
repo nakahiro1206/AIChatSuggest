@@ -1,16 +1,14 @@
-import { useState, useRef, useEffect } from "react";
-import {UserInfo} from "../type"
-import { loadData, loadUserInfo } from "../loadAndStore";
+import { useState, useEffect } from "react";
+import {UserInfo } from "../type"
+import { MESSAGE_PAGE_URL_PATTERN } from "../../env";
+import { loadUserInfo } from "../loadAndStore";
+import { getCurrentTabURL } from "../handleURL";
 
 type LoadingItem = {
     profile: boolean;
     conversations: boolean;
     AIgeneration: boolean;
   };
-
-  const PROFILE_KEY = "profileKey";
-  const CONVERSATIONS_KEY = "conversationsKey";
-  const USER_INFO_KEY = "userId"
 
 export const useStates = () => {
     const [isLoading, setIsLoading] = useState<LoadingItem>({
@@ -37,9 +35,31 @@ export const useStates = () => {
       conversations: [], 
       generatedMessage: ""
     });
-  
+
+    const [userId, setUserId] = useState<string | undefined>(undefined)
+
     useEffect(() => {
-      loadUserInfo(USER_INFO_KEY, setUserInfo);
+      const getUserIdAndLoadDataOnLoad = () => {
+        const messagePageURLPromise: Promise<string | undefined> = getCurrentTabURL();
+        messagePageURLPromise.then((messagePageURL: string | undefined) => {
+          if (!messagePageURL) {
+            throw new Error("Failed to get current URL!");
+          }
+
+          const userIdMatch: RegExpMatchArray | null = messagePageURL.match(
+            MESSAGE_PAGE_URL_PATTERN,
+          );
+          if (!userIdMatch) {
+            throw new Error(`no match for ${messagePageURL}`);
+          }
+  
+          const newUserId: string = userIdMatch[1];
+          setUserId(newUserId);
+          loadUserInfo(newUserId, setUserInfo);
+        })
+      }
+
+      getUserIdAndLoadDataOnLoad();
     }, []);
   
     return {
@@ -48,6 +68,7 @@ export const useStates = () => {
       setIsLoadingProfile,
       setIsLoadingConversations,
       setIsLoadingAIGeneration,
-      userInfo, setUserInfo
+      userInfo, setUserInfo,
+      userId,
     };
   };
