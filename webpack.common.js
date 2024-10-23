@@ -38,7 +38,12 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: "./public" }],
+      patterns: [
+        { from: "./public/icon.png" },
+        { from: "./public/manifest.json" },
+        { from: "./public/popup.html" },
+        { from: "./public/offscreen.html" }
+      ],
     }), 
   ],
   externals: [

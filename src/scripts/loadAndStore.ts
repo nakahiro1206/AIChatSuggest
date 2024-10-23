@@ -5,7 +5,7 @@ import {
   isConversations,
   FavoriteItem,
   UserInfo,
-  isUserInfo
+  isUserInfo,
 } from "./type";
 
 // ローカルストレージからデータを読み込む関数

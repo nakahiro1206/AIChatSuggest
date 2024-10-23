@@ -25,9 +25,6 @@ export const useStates = () => {
     const setIsLoadingAIGeneration = (b: boolean) =>
       setIsLoading({ ...isLoading, AIgeneration: b });
   
-    const conversationsRef = useRef<HTMLTextAreaElement>(null);
-    const AIGenerationRef = useRef<HTMLTextAreaElement>(null);
-  
     const [userInfo, setUserInfo] = useState<UserInfo>({
       profile: {
         nickname: "", 
@@ -42,7 +39,6 @@ export const useStates = () => {
     });
   
     useEffect(() => {
-      loadData(CONVERSATIONS_KEY, conversationsRef);
       loadUserInfo(USER_INFO_KEY, setUserInfo);
     }, []);
   
@@ -52,8 +48,6 @@ export const useStates = () => {
       setIsLoadingProfile,
       setIsLoadingConversations,
       setIsLoadingAIGeneration,
-      conversationsRef,
-      AIGenerationRef,
       userInfo, setUserInfo
     };
   };

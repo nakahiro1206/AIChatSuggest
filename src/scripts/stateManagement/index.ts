@@ -1,3 +1,3 @@
 export {useStates} from "./useStates"
-export {handlers} from "./handlers"
+export {profileOnClickHandler, conversationsOnClickHandler, AIGenerationOnClickHandler} from "./handlers"
 export {usePort} from "./usePort"

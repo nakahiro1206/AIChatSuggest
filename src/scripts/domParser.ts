@@ -8,8 +8,7 @@ const getTextContent = (elements: NodeListOf<Element>): string => {
 };
 
 const getTextContentToArray = (elements: NodeListOf<Element>): string[] => {
-  return Array.from(elements)
-    .map((el) => el.textContent?.trim() || "")
+  return Array.from(elements).map((el) => el.textContent?.trim() || "");
 };
 
 const integrateTitleAndDescription = (

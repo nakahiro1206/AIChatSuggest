@@ -9,6 +9,8 @@ export type Commands =
   | "generateMessage"
   | "receiveGeneratedMessage";
 
+export type CallCommands = "getProfileCall" | "getConversationsCall";
+
 export type Message =
   | { action: "getProfileCall"; content: string } // raw html -> URL/string/null
   | { action: "getProfile"; content: string } // raw html
@@ -70,7 +72,7 @@ export const isFavoriteItems = (data: any): data is FavoriteItem[] => {
       typeof item === "object" &&
       item !== null &&
       typeof item.title === "string" &&
-      typeof item.description === "string"
+      typeof item.description === "string",
   );
 };
 
@@ -79,10 +81,7 @@ export const isStringArray = (data: any): data is string[] => {
     return false;
   }
 
-  return data.every(
-    (item) =>
-      typeof item === "string"
-  );
+  return data.every((item) => typeof item === "string");
 };
 
 export const isProfile = (data: any): data is Profile => {
@@ -102,7 +101,7 @@ export type UserInfo = {
   profile: Profile;
   conversations: ConversationItem[];
   generatedMessage: string;
-}
+};
 
 export const isUserInfo = (data: any): data is UserInfo => {
   return (
@@ -111,5 +110,35 @@ export const isUserInfo = (data: any): data is UserInfo => {
     isProfile(data.profile) &&
     isConversations(data.conversations) &&
     typeof data.generatedMessage === "string"
-  )
+  );
+};
+
+export type ChatCompletionMessageParam = {
+  "role": "system" | "user" | "assistant";
+  "content": string;
+}
+
+export const stringifyUserInfo = (userInfo: UserInfo): ChatCompletionMessageParam[] => {
+  const {profile, conversations} = userInfo;
+  const messages: ChatCompletionMessageParam[] = [];
+
+  const {nickname, ageAndRegion, introduction, preference, favorite, commonality} = profile;
+  const stringifiedProfile: string = `Name: ${nickname}, age and region: ${ageAndRegion}, introduction: ${introduction}` + 
+  `favorite: [${favorite.map(({title, description})=>`[${title}: ${description}]`).join()}]` + 
+  `preference: [${preference.map((item)=>`${item}`).join()}]`
+  
+  messages.push({
+    "role": "system",
+    "content": `Please simulate the next message based on user's profile and the conversation history. The user's profile is ${stringifiedProfile}`
+  })
+
+  conversations.map(({sender, content}) => {
+    const item: ChatCompletionMessageParam = {
+      "role": (sender == "me")? "assistant": "user",
+      "content": content
+    }
+    messages.push(item);
+  })
+
+  return messages;
 }

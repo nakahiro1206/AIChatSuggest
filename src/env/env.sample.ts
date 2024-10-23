@@ -16,4 +16,4 @@ export const QUERY = {
   SENDER_ATTRIBUTE: "",
 };
 
-export const OPENAI_API_KEY="";
+export const OPENAI_API_KEY = "";

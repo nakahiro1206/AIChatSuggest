@@ -1,6 +1,5 @@
-import { Message } from "../type";
+import { Message, CallCommands, UserInfo } from "../type";
 import { storeUserInfo } from "../loadAndStore";
-import { UserInfo } from "../type";
 
 export const usePort = (
     userInfo: UserInfo, 
@@ -32,9 +31,9 @@ export const usePort = (
       }
     });
   
-    const fetchData = (
+    const callCommandToExtractDataFromUrl = (
       resourceURL: URL,
-      callCommand: "getProfileCall" | "getConversationsCall",
+      callCommand: CallCommands,
       setIsloadingOfItem: (setTo: boolean) => void,
     ) => {
       setIsloadingOfItem(true);
@@ -73,7 +72,7 @@ export const usePort = (
     };
   
     return {
-      fetchData,
+      callCommandToExtractDataFromUrl,
     };
   };
 

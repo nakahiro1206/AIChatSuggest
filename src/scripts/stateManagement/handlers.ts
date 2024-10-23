@@ -1,56 +1,138 @@
-import {MESSAGE_PAGE_URL_PATTERN, formatUserPageURL} from "../../env"
+import {MESSAGE_PAGE_URL_PATTERN, formatUserPageURL, OPENAI_API_KEY} from "../../env"
 import {getCurrentTabURL} from "../utils"
-import {callChatCompletion} from "../callChatCompletion"
+import { CallCommands, UserInfo, stringifyUserInfo } from "../type";
 
-export const handlers = (
-    setIsLoadingProfile:(b: boolean)=>void,
-    setIsLoadingConversations:(b: boolean)=>void,
-    setIsLoadingAIGeneration:(b: boolean)=>void,
-    fetchData: (resourceURL: URL, callCommand: "getProfileCall" | "getConversationsCall", setIsloadingOfItem: (setTo: boolean) => void) => void,
-    AIGenerationRef: React.RefObject<HTMLTextAreaElement>
+export const profileOnClickHandler = (
+  setIsLoadingProfile:(b: boolean)=>void,
+  callCommandToExtractDataFromUrl: (resourceURL: URL, callCommand: CallCommands, setIsloadingOfItem: (setTo: boolean) => void) => void,
 ) => {
-  
-    const getProfileFromMessagePage = async () => {
-      const messagePageURL: string | undefined = await getCurrentTabURL();
-      if (!messagePageURL) {
-        throw new Error("Failed to get current URL!");
+
+  const getProfileFromMessagePage = async () => {
+    const messagePageURL: string | undefined = await getCurrentTabURL();
+    if (!messagePageURL) {
+      throw new Error("Failed to get current URL!");
+    }
+
+    const userIdMatch: RegExpMatchArray | null = messagePageURL.match(
+      MESSAGE_PAGE_URL_PATTERN,
+    );
+    if (!userIdMatch) {
+      throw new Error(`no match for ${messagePageURL}`);
+    }
+
+    const userId: string = userIdMatch[1];
+
+    const userPageURL = new URL(formatUserPageURL(userId));
+
+    callCommandToExtractDataFromUrl(
+      userPageURL, 
+      "getProfileCall", 
+      setIsLoadingProfile
+    );
+  };
+
+  return {
+    getProfileFromMessagePage
+  };
+};
+
+export const conversationsOnClickHandler = (
+  setIsLoadingConversations:(b: boolean)=>void,
+  callCommandToExtractDataFromUrl: (resourceURL: URL, callCommand: CallCommands, setIsloadingOfItem: (setTo: boolean) => void) => void,
+) => {
+
+  const getConversationsFromCurrentURL = async () => {
+    const currentURL: string | undefined = await getCurrentTabURL();
+
+    if (currentURL === undefined) {
+      throw new Error("Failed to get current URL!");
+    }
+
+    callCommandToExtractDataFromUrl(
+      new URL(currentURL),
+      "getConversationsCall",
+      setIsLoadingConversations,
+    );
+  };
+
+  return {
+    getConversationsFromCurrentURL,
+  };
+};
+
+export const AIGenerationOnClickHandler = (
+    setIsLoadingAIGeneration:(b: boolean)=>void,
+    userInfo: UserInfo,
+    setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>
+) => {  
+    const generateNextMessage = async () => {
+          setIsLoadingAIGeneration(true);
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + OPENAI_API_KEY,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: stringifyUserInfo(userInfo),
+          stream: true,
+        }),
+      });
+
+      if (!response.body) throw new Error("ReadableStream not supported");
+
+      const reader = response.body.getReader();
+
+      const decoder = new TextDecoder();
+      const loopRunner = true;
+      let partialMessage = "";
+
+      while (loopRunner) {
+        // Here we start reading the stream, until its done.
+        const { value, done } = await reader.read();
+        if (done) {
+          break;
+        }
+        const decodedChunk = decoder.decode(value, { stream: true });
+        // The streamed data may contain multiple JSON objects, separated by newlines.
+        const lines = decodedChunk.split("\n").filter((line) => line.trim() !== "");
+
+        for (const line of lines) {
+          // Each line may begin with "data: ", we need to remove that prefix.
+          if (line.startsWith("data: ")) {
+            const jsonData = line.replace("data: ", "");
+
+            // Ignore "[DONE]" message.
+            if (jsonData === "[DONE]") {
+              break;
+            }
+
+            try {
+              // Parse the JSON data.
+              const parsedData = JSON.parse(jsonData);
+              const content = parsedData.choices[0]?.delta?.content;
+
+              // If there is new content, append it to the textarea.
+              if (content) {
+                partialMessage += content;
+                setUserInfo((userInfo: UserInfo) => {
+                  return {
+                    ...userInfo, "generatedMessage": userInfo.generatedMessage + content
+                  }
+                })
+              }
+            } catch (error) {
+              console.error("Failed to parse streamed data:", error);
+            }
+          }
+        }
       }
-  
-      const userIdMatch: RegExpMatchArray | null = messagePageURL.match(
-        MESSAGE_PAGE_URL_PATTERN,
-      );
-      if (!userIdMatch) {
-        throw new Error(`no match for ${messagePageURL}`);
-      }
-  
-      const userId: string = userIdMatch[1];
-  
-      const userPageURL = new URL(formatUserPageURL(userId));
-  
-      fetchData(userPageURL, "getProfileCall", setIsLoadingProfile);
-    };
-  
-    const getConversationsFromCurrentURL = async () => {
-      const currentURL: string | undefined = await getCurrentTabURL();
-  
-      if (currentURL === undefined) {
-        throw new Error("Failed to get current URL!");
-      }
-  
-      fetchData(
-        new URL(currentURL),
-        "getConversationsCall",
-        setIsLoadingConversations,
-      );
-    };
-  
-    const generateNextMessage = () => {
-      callChatCompletion(setIsLoadingAIGeneration, AIGenerationRef);
+      setIsLoadingAIGeneration(false);
     };
   
     return {
-      getProfileFromMessagePage,
-      getConversationsFromCurrentURL,
       generateNextMessage,
     };
   };
