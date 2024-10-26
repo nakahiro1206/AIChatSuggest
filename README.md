@@ -1,13 +1,7 @@
 ## AI-chat-suggest
 
-### This repository is under developing
-Implemented functions
-- fetch html files with cookie credentials.
-- scrape tagged elements.
-
-To be implemented
-- Generate messages with ChatGPT API.
-- Storing data for each user.
+### Medium article
+https://medium.com/@4u72qu6pmt/ai-powered-chat-support-on-dating-app-8d1062e03d60
 
 ### Overview
 Chrome extension to support chat on some dating app.
