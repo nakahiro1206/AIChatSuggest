@@ -33,7 +33,7 @@ export type ConversationItem = {
   content: string;
 };
 
-export const isConversations = (data: any): data is ConversationItem[] => {
+export const isConversations = (data: unknown): data is ConversationItem[] => {
   if (!Array.isArray(data)) {
     return false;
   }
@@ -63,7 +63,7 @@ export type FavoriteItem = {
   description: string;
 };
 
-export const isFavoriteItems = (data: any): data is FavoriteItem[] => {
+export const isFavoriteItems = (data: unknown): data is FavoriteItem[] => {
   if (!Array.isArray(data)) {
     return false;
   }
@@ -77,7 +77,7 @@ export const isFavoriteItems = (data: any): data is FavoriteItem[] => {
   );
 };
 
-export const isStringArray = (data: any): data is string[] => {
+export const isStringArray = (data: unknown): data is string[] => {
   if (!Array.isArray(data)) {
     return false;
   }
@@ -136,7 +136,8 @@ export const stringifyUserInfo = (
   const stringifiedProfile: string =
     `Name: ${nickname}, age and region: ${ageAndRegion}, introduction: ${introduction}` +
     `favorite: [${favorite.map(({ title, description }) => `[${title}: ${description}]`).join()}]` +
-    `preference: [${preference.map((item) => `${item}`).join()}]`;
+    `preference: [${preference.map((item) => `${item}`).join()}]` + 
+    `commonality: [${commonality.map((item) => `${item}`).join()}]`;
 
   messages.push({
     role: "system",

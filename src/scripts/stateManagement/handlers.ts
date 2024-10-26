@@ -1,5 +1,6 @@
-import {MESSAGE_PAGE_URL_PATTERN, formatUserPageURL, OPENAI_API_KEY} from "../../env"
+import {formatUserPageURL, OPENAI_API_KEY} from "../../env"
 import {getCurrentTabURL} from "../handleURL"
+import { storeUserInfo } from "../loadAndStore";
 import { CallCommands, UserInfo, stringifyUserInfo } from "../type";
 
 export const profileOnClickHandler = (
@@ -54,10 +55,16 @@ export const conversationsOnClickHandler = (
 export const AIGenerationOnClickHandler = (
     setIsLoadingAIGeneration:(b: boolean)=>void,
     userInfo: UserInfo,
-    setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>
+    setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>,
+    userId: string | undefined
 ) => {  
     const generateNextMessage = async () => {
-          setIsLoadingAIGeneration(true);
+      setIsLoadingAIGeneration(true);
+      setUserInfo((userInfo: UserInfo) => {
+        return {
+          ...userInfo, "generatedMessage": ""
+        }
+      })
 
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -78,7 +85,7 @@ export const AIGenerationOnClickHandler = (
 
       const decoder = new TextDecoder();
       const loopRunner = true;
-      let partialMessage = "";
+      let generatedMessage: string = "";
 
       while (loopRunner) {
         // Here we start reading the stream, until its done.
@@ -107,10 +114,10 @@ export const AIGenerationOnClickHandler = (
 
               // If there is new content, append it to the textarea.
               if (content) {
-                partialMessage += content;
+                generatedMessage += content;
                 setUserInfo((userInfo: UserInfo) => {
                   return {
-                    ...userInfo, "generatedMessage": userInfo.generatedMessage + content
+                    ...userInfo, "generatedMessage": generatedMessage
                   }
                 })
               }
@@ -120,6 +127,7 @@ export const AIGenerationOnClickHandler = (
           }
         }
       }
+      storeUserInfo(userId, {...userInfo, "generatedMessage": generatedMessage})
       setIsLoadingAIGeneration(false);
     };
   

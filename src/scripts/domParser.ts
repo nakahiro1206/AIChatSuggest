@@ -16,7 +16,7 @@ const integrateTitleAndDescription = (
   descriptopns: NodeListOf<Element>,
 ) => {
   const minLength = Math.min(titles.length, descriptopns.length);
-  let res: FavoriteItem[] = [];
+  const res: FavoriteItem[] = [];
   for (let idx = 0; idx < minLength; idx++) {
     const item: FavoriteItem = {
       title: `${titles[idx].textContent?.trim() || ""}`,

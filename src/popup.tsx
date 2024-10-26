@@ -4,7 +4,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import { Box, Tab, Tabs, unstable_useEnhancedEffect } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import Button from "@mui/joy/Button";
 
 import {useStates, usePort, 
@@ -50,7 +50,8 @@ const Popup = () => {
   } = AIGenerationOnClickHandler(
     setIsLoadingAIGeneration,
     userInfo, 
-    setUserInfo
+    setUserInfo,
+    userId
   );
 
 
@@ -107,13 +108,23 @@ const Popup = () => {
       </TabPanel>
       <TabPanel value={value} index={1}>
       <Item>
-        <Box sx={{ p: 1 }}>
+        <Box sx={{
+          p: 1, 
+          display: "flex",
+          justifyContent: "center"
+          }}>
           <Button
             onClick={getConversationsFromCurrentURL}
             disabled={userId === undefined}
             loading={isLoading.conversations}
             sx={{
               whiteSpace: "nowrap",
+              backgroundColor: "#f5f5f5",
+              color: "#fe6970",
+              "&:hover": {
+                backgroundColor: "#f5f5f5",
+                opacity: 1
+              }
             }}
           >
             Fetch Conversations

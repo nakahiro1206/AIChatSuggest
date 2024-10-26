@@ -13,8 +13,8 @@ export const loadUserInfo = (
     return;
   }
 
-  chrome.storage.local.get(userId).then((data: any) => {
-    const value: any = data[userId];
+  chrome.storage.local.get(userId).then((data) => {
+    const value = data[userId];
     console.log(value)
     if (!isUserInfo(value)) {
       console.error("invalid data for ConversationItem[]");
@@ -29,7 +29,7 @@ export const storeUserInfo = (userId: string | undefined, value: UserInfo) => {
     throw new Error("storeUserInfo: userId is undefined!");
   }
   // ローカルストレージに保存
-  const obj: { [userId: string]: any } = {};
+  const obj: { [userId: string]: UserInfo } = {};
   obj[userId] = value;
   chrome.storage.local.set(obj);
 };
